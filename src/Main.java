@@ -4,7 +4,7 @@ public class Main {
     @SuppressWarnings("ConvertToTryWithResources")
     public static void main(String[] args) {
         // Dados de conexão
-        String url = "jdbc:mysql://localhost:3306/loja";
+        String url = "jdbc:mysql://localhost:3309/java";
         String usuario = "root";
         String senha = ""; // Substitua pela sua senha do MySQL
 
