@@ -10,5 +10,7 @@ public class Conexao {
     public static Connection getConnection(String connectionUrl, String user, String pass) throws SQLException {
         return DriverManager.getConnection(connectionUrl, user, pass);
     }
-    public static Connection 
+    public static void dropConnection(Connection pointer) throws SQLException {
+        if (pointer != null) pointer.close();
+    }
 }

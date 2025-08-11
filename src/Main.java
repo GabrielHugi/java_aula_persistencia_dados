@@ -52,10 +52,13 @@ public class Main {
 
             case 2:
                 try {
+                    String temp;
+
                     System.out.println("Insira o nome do produto");
                     String nome = scanf.nextLine();
                     System.out.println("Insira o preço do produto");
-                    Double preco = scanf.nextDouble();
+                    temp = scanf.nextLine();
+                    Double preco = Double.parseDouble(temp);
                     
 
 
