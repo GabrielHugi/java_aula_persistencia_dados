@@ -1,93 +1,63 @@
 // compile command
-// javac -d bin -cp lib/mysql-connector-j-9.4.0.jar src/Main.java
+// javac -d ..\bin -cp "lib\mysql-connector-j-9.4.0.jar;src" (Get-ChildItem -Recurse -Filter *.java).FullName
+// in src
 // run command
 // java -cp "bin;lib/mysql-connector-j-9.4.0.jar" Main
+// in main
 
-import java.sql.*;
-import java.util.Scanner;
+import java.util.*;
+import globalvars.*;
+import functions.*;
+import models.*;
 
 public class Main {
     @SuppressWarnings("ConvertToTryWithResources")
     public static void main(String[] args) {
-        // Dados de conexão
-        String url = "jdbc:mysql://localhost:3309/java";
-        String usuario = "root";
-        String senha = ""; // Substitua pela sua senha do MySQL
-        
-        // input
-        Scanner scanf = new Scanner(System.in);
-        System.out.println("1 - Get all items\n2 - Insert item");
-        int option = scanf.nextInt();
-        switch (option) {
+        ProdutoDAO dao = new ProdutoDAO();
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("1 - Inserir | 2 - Listar | 3 - Atualizar | 4 - Deletar");
+        int opcao = sc.nextInt();
+        sc.nextLine(); // Limpa buffer
+
+        switch (opcao) {
             case 1:
-                try {
-                    // Estabelece a conexão com o banco de dados
-                    Connection conexao = DriverManager.getConnection(url, usuario, senha);
-                    System.out.println("Conexão estabelecida com sucesso!");
-
-                    // Cria e executa uma consulta SQL
-                    String sql = "SELECT * FROM produtos";
-                    Statement stmt = conexao.createStatement();
-                    ResultSet resultado = stmt.executeQuery(sql);
-
-                    // Exibe os produtos no console
-                    System.out.println("Lista de Produtos:");
-                    while (resultado.next()) {
-                        int id = resultado.getInt("id");
-                        String nome = resultado.getString("nome");
-                        double preco = resultado.getDouble("preco");
-
-                        System.out.println(id + " - " + nome + " - R$ " + preco);
-                    }
-
-                    // Fecha a conexão
-                    resultado.close();
-                    stmt.close();
-                    conexao.close();
-
-                } catch (SQLException e) {
-                    System.out.println("Erro ao conectar: " + e.getMessage());
-                }
+                System.out.print("Nome: ");
+                String nome = sc.nextLine();
+                System.out.print("Preco: ");
+                double preco = sc.nextDouble();
+                Produto p = new Produto(nome, preco);
+                dao.inserir(p);
                 break;
 
             case 2:
-                try {
-                    String temp;
-
-                    System.out.println("Insira o nome do produto");
-                    String nome = scanf.nextLine();
-                    System.out.println("Insira o preço do produto");
-                    temp = scanf.nextLine();
-                    Double preco = Double.parseDouble(temp);
-                    
-
-
-                    // Estabelece a conexão com o banco de dados
-                    Connection conexao = DriverManager.getConnection(url, usuario, senha);
-                    System.out.println("Conexão estabelecida com sucesso!");
-
-                    // Cria e executa uma consulta SQL
-                    String sqlInsert = "INSERT INTO produtos (nome, preco) VALUES (?, ?)";
-                    PreparedStatement pstmt = conexao.prepareStatement(sqlInsert);
-                    pstmt.setString(1, nome); // nome
-                    pstmt.setDouble(2, preco); // preço
-
-                    int rowsAffected = pstmt.executeUpdate(); // runs the insert
-                    if (rowsAffected > 0) {
-                        System.out.println("Produto inserido com sucesso!");
-                    }
-
-                    // Fecha a conexão
-                    pstmt.close();
-                    conexao.close();
-
-                } catch (SQLException e) {
-                    System.out.println("Erro ao conectar: " + e.getMessage());
+                for (Produto prod : dao.listar()) {
+                    System.out.println(prod.getNome() + " - R$ " + prod.getPreco());
                 }
                 break;
 
+            case 3:
+                System.out.print("ID do produto: ");
+                int id = sc.nextInt();
+                sc.nextLine();
+                System.out.print("Novo nome: ");
+                nome = sc.nextLine();
+                System.out.print("Novo preco: ");
+                preco = sc.nextDouble();
+                p = new Produto(nome, preco);
+                p.setId(id);
+                dao.atualizar(p);
+                break;
+
+            case 4:
+                System.out.print("ID do produto a deletar: ");
+                id = sc.nextInt();
+                dao.deletar(id);
+                break;
+
             default:
-                throw new AssertionError();
+                System.out.println("Opção inválida.");
         }
+        sc.close();
     }
 }
